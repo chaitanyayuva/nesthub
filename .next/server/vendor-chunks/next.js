@@ -373,6 +373,36 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+/***/ "(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"DM_Sans\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-dm-sans\"}],\"variableName\":\"dmSans\"}":
+/*!****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/google/target.css?{"path":"app\\layout.jsx","import":"DM_Sans","arguments":[{"subsets":["latin"],"variable":"--font-dm-sans"}],"variableName":"dmSans"} ***!
+  \****************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'__DM_Sans_0d7163', '__DM_Sans_Fallback_0d7163'\",\"fontStyle\":\"normal\"},\n\t\"className\": \"__className_0d7163\",\n\t\"variable\": \"__variable_0d7163\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzP3tcInBhdGhcIjpcImFwcFxcXFxsYXlvdXQuanN4XCIsXCJpbXBvcnRcIjpcIkRNX1NhbnNcIixcImFyZ3VtZW50c1wiOlt7XCJzdWJzZXRzXCI6W1wibGF0aW5cIl0sXCJ2YXJpYWJsZVwiOlwiLS1mb250LWRtLXNhbnNcIn1dLFwidmFyaWFibGVOYW1lXCI6XCJkbVNhbnNcIn0iLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBLFdBQVcsb0ZBQW9GO0FBQy9GO0FBQ0E7QUFDQSIsInNvdXJjZXMiOlsid2VicGFjazovL25lc3RodWIvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzPzA4MjQiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gRXhwb3J0c1xubW9kdWxlLmV4cG9ydHMgPSB7XG5cdFwic3R5bGVcIjoge1wiZm9udEZhbWlseVwiOlwiJ19fRE1fU2Fuc18wZDcxNjMnLCAnX19ETV9TYW5zX0ZhbGxiYWNrXzBkNzE2MydcIixcImZvbnRTdHlsZVwiOlwibm9ybWFsXCJ9LFxuXHRcImNsYXNzTmFtZVwiOiBcIl9fY2xhc3NOYW1lXzBkNzE2M1wiLFxuXHRcInZhcmlhYmxlXCI6IFwiX192YXJpYWJsZV8wZDcxNjNcIlxufTtcbiJdLCJuYW1lcyI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"DM_Sans\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-dm-sans\"}],\"variableName\":\"dmSans\"}\n");
+
+/***/ }),
+
+/***/ "(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"JetBrains_Mono\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-jetbrains-mono\"}],\"variableName\":\"jetbrainsMono\"}":
+/*!*************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/google/target.css?{"path":"app\\layout.jsx","import":"JetBrains_Mono","arguments":[{"subsets":["latin"],"variable":"--font-jetbrains-mono"}],"variableName":"jetbrainsMono"} ***!
+  \*************************************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'__JetBrains_Mono_3c557b', '__JetBrains_Mono_Fallback_3c557b'\",\"fontStyle\":\"normal\"},\n\t\"className\": \"__className_3c557b\",\n\t\"variable\": \"__variable_3c557b\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzP3tcInBhdGhcIjpcImFwcFxcXFxsYXlvdXQuanN4XCIsXCJpbXBvcnRcIjpcIkpldEJyYWluc19Nb25vXCIsXCJhcmd1bWVudHNcIjpbe1wic3Vic2V0c1wiOltcImxhdGluXCJdLFwidmFyaWFibGVcIjpcIi0tZm9udC1qZXRicmFpbnMtbW9ub1wifV0sXCJ2YXJpYWJsZU5hbWVcIjpcImpldGJyYWluc01vbm9cIn0iLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBLFdBQVcsa0dBQWtHO0FBQzdHO0FBQ0E7QUFDQSIsInNvdXJjZXMiOlsid2VicGFjazovL25lc3RodWIvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzPzVlZjEiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gRXhwb3J0c1xubW9kdWxlLmV4cG9ydHMgPSB7XG5cdFwic3R5bGVcIjoge1wiZm9udEZhbWlseVwiOlwiJ19fSmV0QnJhaW5zX01vbm9fM2M1NTdiJywgJ19fSmV0QnJhaW5zX01vbm9fRmFsbGJhY2tfM2M1NTdiJ1wiLFwiZm9udFN0eWxlXCI6XCJub3JtYWxcIn0sXG5cdFwiY2xhc3NOYW1lXCI6IFwiX19jbGFzc05hbWVfM2M1NTdiXCIsXG5cdFwidmFyaWFibGVcIjogXCJfX3ZhcmlhYmxlXzNjNTU3YlwiXG59O1xuIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"JetBrains_Mono\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-jetbrains-mono\"}],\"variableName\":\"jetbrainsMono\"}\n");
+
+/***/ }),
+
+/***/ "(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"Syne\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-syne\"}],\"variableName\":\"syne\"}":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/google/target.css?{"path":"app\\layout.jsx","import":"Syne","arguments":[{"subsets":["latin"],"variable":"--font-syne"}],"variableName":"syne"} ***!
+  \********************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'__Syne_744198', '__Syne_Fallback_744198'\",\"fontStyle\":\"normal\"},\n\t\"className\": \"__className_744198\",\n\t\"variable\": \"__variable_744198\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzP3tcInBhdGhcIjpcImFwcFxcXFxsYXlvdXQuanN4XCIsXCJpbXBvcnRcIjpcIlN5bmVcIixcImFyZ3VtZW50c1wiOlt7XCJzdWJzZXRzXCI6W1wibGF0aW5cIl0sXCJ2YXJpYWJsZVwiOlwiLS1mb250LXN5bmVcIn1dLFwidmFyaWFibGVOYW1lXCI6XCJzeW5lXCJ9IiwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQSxXQUFXLDhFQUE4RTtBQUN6RjtBQUNBO0FBQ0EiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9uZXN0aHViLy4vbm9kZV9tb2R1bGVzL25leHQvZm9udC9nb29nbGUvdGFyZ2V0LmNzcz83MWJkIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIEV4cG9ydHNcbm1vZHVsZS5leHBvcnRzID0ge1xuXHRcInN0eWxlXCI6IHtcImZvbnRGYW1pbHlcIjpcIidfX1N5bmVfNzQ0MTk4JywgJ19fU3luZV9GYWxsYmFja183NDQxOTgnXCIsXCJmb250U3R5bGVcIjpcIm5vcm1hbFwifSxcblx0XCJjbGFzc05hbWVcIjogXCJfX2NsYXNzTmFtZV83NDQxOThcIixcblx0XCJ2YXJpYWJsZVwiOiBcIl9fdmFyaWFibGVfNzQ0MTk4XCJcbn07XG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.jsx\",\"import\":\"Syne\",\"arguments\":[{\"subsets\":[\"latin\"],\"variable\":\"--font-syne\"}],\"variableName\":\"syne\"}\n");
+
+/***/ }),
+
 /***/ "(ssr)/./node_modules/next/dist/api/link.js":
 /*!********************************************!*\
   !*** ./node_modules/next/dist/api/link.js ***!

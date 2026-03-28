@@ -8,7 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["var(--font-sans)", "Inter", "sans-serif"],
+        heading: ["var(--font-heading)", "Plus Jakarta Sans", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
         nesthub: {

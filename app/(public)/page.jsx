@@ -131,7 +131,7 @@ export default function Welcome() {
         </div>
 
         {/* Design System Info */}
-        <div className="mt-12 bg-nesthub-surface border border-nesthub-border rounded-xl p-6">
+        {/* <div className="mt-12 bg-nesthub-surface border border-nesthub-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-3">
             <h3
               className="text-[14px] font-bold text-nesthub-text-primary"
@@ -186,7 +186,7 @@ export default function Welcome() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
