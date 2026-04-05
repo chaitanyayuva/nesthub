@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { usePayments } from "../../../hooks/usePayments";
 import { CreditCard, History, ChevronRight, ReceiptText, AlertTriangle, Zap, HomeIcon } from "lucide-react";
+import { ConfirmPaymentModal } from "../../../components/student/ConfirmPaymentModal";
 
 export default function StudentPayments() {
   const { currentDues, totalAmount, history } = usePayments();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const getDuesIcon = (type) => {
     switch(type) {
@@ -55,7 +58,10 @@ export default function StudentPayments() {
           </div>
         </div>
 
-        <button className="w-full bg-nesthub-accent hover:bg-[#E59734] text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl shadow-nesthub-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+        <button
+          onClick={() => setIsConfirmOpen(true)}
+          className="w-full bg-nesthub-accent hover:bg-[#E59734] text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl shadow-nesthub-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+        >
           Process Payment
           <ChevronRight size={18} strokeWidth={3} />
         </button>
@@ -106,6 +112,16 @@ export default function StudentPayments() {
            </p>
         </div>
       </div>
+
+      {/* Confirm Payment Modal */}
+      <ConfirmPaymentModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        dues={currentDues}
+        onConfirm={() => {
+          console.log("Payment confirmed");
+        }}
+      />
     </div>
   );
 }

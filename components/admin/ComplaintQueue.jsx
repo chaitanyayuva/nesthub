@@ -14,7 +14,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 
-export function ComplaintQueue({ complaints }) {
+export function ComplaintQueue({ complaints, onAssign }) {
   const getPriorityColor = (p) => {
     switch(p) {
       case "P1": return "bg-red-50 text-red-600 ring-1 ring-red-100";
@@ -96,9 +96,21 @@ export function ComplaintQueue({ complaints }) {
 
               <div className="flex flex-col sm:flex-row gap-3 mt-auto">
                  {comp.status === "Open" && (
-                   <button className="flex-1 bg-nesthub-primary text-white py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all flex items-center justify-center gap-2">
+                   <button
+                     onClick={() => onAssign?.(comp)}
+                     className="flex-1 bg-nesthub-primary text-white py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all flex items-center justify-center gap-2"
+                   >
                       <Plus size={16} />
                       Assign Staff
+                   </button>
+                 )}
+                 {comp.status === "In Progress" && (
+                   <button
+                     onClick={() => onAssign?.(comp)}
+                     className="flex-1 bg-orange-500 text-white py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-orange-500/20 hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+                   >
+                      <Wrench size={16} />
+                      Reassign
                    </button>
                  )}
                  {comp.status === "In Progress" && (

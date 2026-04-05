@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useStudents } from "../../../hooks/useStudents";
 import { StudentFilters } from "../../../components/admin/StudentFilters";
 import { StudentTable } from "../../../components/admin/StudentTable";
+import { AddStudentModal } from "../../../components/admin/AddStudentModal";
 import { Download, UserPlus } from "lucide-react";
 
 export default function AdminStudents() {
   const { students, searchTerm, setSearchTerm, totalCount } = useStudents();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
     <div className="animate-fade-in max-w-[1400px] mx-auto px-1 sm:px-0">
@@ -21,7 +24,10 @@ export default function AdminStudents() {
                <Download size={16} strokeWidth={2.5} />
                Export
             </button>
-            <button className="flex-1 sm:flex-initial bg-nesthub-primary text-white px-6 py-3.5 rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-nesthub-primary/20 flex items-center justify-center gap-2.5 hover:bg-[#204a35] transition-all active:scale-95">
+            <button
+               onClick={() => setIsAddModalOpen(true)}
+               className="flex-1 sm:flex-initial bg-nesthub-primary text-white px-6 py-3.5 rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-nesthub-primary/20 flex items-center justify-center gap-2.5 hover:bg-[#204a35] transition-all active:scale-95"
+            >
                <UserPlus size={16} strokeWidth={2.5} />
                Add New
             </button>
@@ -44,6 +50,13 @@ export default function AdminStudents() {
             <button className="flex-1 sm:flex-initial px-8 py-3.5 bg-nesthub-primary/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-nesthub-primary hover:bg-nesthub-primary hover:text-white transition-all shadow-sm active:scale-95">Next</button>
          </div>
       </div>
+
+      {/* Add Student Modal */}
+      <AddStudentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={(data) => console.log("New student:", data)}
+      />
     </div>
   );
 }

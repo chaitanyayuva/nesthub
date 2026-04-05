@@ -1,6 +1,16 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BarChart3, Users2, DoorOpen, CreditCard, MessageSquareWarning, TrendingUp, ArrowUpRight, ArrowDownRight, UserPlus, Clock } from "lucide-react";
+import { AddStudentModal } from "../../components/admin/AddStudentModal";
+import { PostNoticeModal } from "../../components/admin/PostNoticeModal";
 
 export default function AdminOverview() {
+  const router = useRouter();
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [isPostNoticeOpen, setIsPostNoticeOpen] = useState(false);
+
   const metrics = [
     { label: "Occupancy Rate", value: "92%", trend: "+2.4%", isPositive: true, icon: Users2, color: "bg-blue-500" },
     { label: "Total Revenue", value: "₹2.45L", trend: "+12.1%", isPositive: true, icon: TrendingUp, color: "bg-green-500" },
@@ -90,9 +100,9 @@ export default function AdminOverview() {
 
             {/* Quick Actions Grid */}
             <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-6">
-                <AdminActionCard title="Add Student" desc="Enroll new resident" icon={UserPlus} />
-                <AdminActionCard title="Room Status" desc="Manage allocations" icon={DoorOpen} />
-                <AdminActionCard title="New Notice" desc="Broadcast update" icon={Clock} />
+                <AdminActionCard title="Add Student" desc="Enroll new resident" icon={UserPlus} onClick={() => setIsAddStudentOpen(true)} />
+                <AdminActionCard title="Room Status" desc="Manage allocations" icon={DoorOpen} onClick={() => router.push('/admin/rooms')} />
+                <AdminActionCard title="New Notice" desc="Broadcast update" icon={Clock} onClick={() => setIsPostNoticeOpen(true)} />
             </div>
          </div>
 
@@ -124,6 +134,18 @@ export default function AdminOverview() {
             </button>
          </div>
       </div>
+
+      <AddStudentModal
+        isOpen={isAddStudentOpen}
+        onClose={() => setIsAddStudentOpen(false)}
+        onSubmit={(data) => console.log("Added from dashboard:", data)}
+      />
+
+      <PostNoticeModal
+        isOpen={isPostNoticeOpen}
+        onClose={() => setIsPostNoticeOpen(false)}
+        onSubmit={(data) => console.log("Notice from dashboard:", data)}
+      />
     </div>
   );
 }
@@ -136,9 +158,9 @@ function CalendarIcon() {
    );
 }
 
-function AdminActionCard({ title, desc, icon: Icon }) {
+function AdminActionCard({ title, desc, icon: Icon, onClick }) {
    return (
-      <button className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all text-left flex flex-col gap-4 group">
+      <button onClick={onClick} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all text-left flex flex-col gap-4 group cursor-pointer active:scale-95">
          <div className="p-3 bg-nesthub-primary/5 text-nesthub-primary rounded-2xl group-hover:bg-nesthub-primary group-hover:text-white transition-all duration-300 self-start">
             <Icon size={20} strokeWidth={2.5} />
          </div>

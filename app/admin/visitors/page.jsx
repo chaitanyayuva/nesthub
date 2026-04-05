@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useVisitors } from "../../../hooks/useVisitors";
 import { VisitorRequests, VisitorLogs } from "../../../components/admin/VisitorLogs";
+import { ApproveVisitorModal } from "../../../components/admin/ApproveVisitorModal";
 import { Search, History, UserSquare2, ChevronRight, Settings2 } from "lucide-react";
 
 export default function AdminVisitors() {
   const { pendingApprovals, historicalLogs, searchTerm, setSearchTerm, activeInside } = useVisitors();
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   return (
     <div className="animate-fade-in max-w-[1400px] mx-auto px-4 sm:px-0">
@@ -42,7 +45,10 @@ export default function AdminVisitors() {
             </h2>
          </div>
          <div className="overflow-x-auto scrollbar-none pb-2">
-            <VisitorRequests requests={pendingApprovals} />
+            <VisitorRequests 
+              requests={pendingApprovals}
+              onReview={(req) => setSelectedRequest(req)}
+            />
          </div>
       </div>
 
@@ -85,6 +91,21 @@ export default function AdminVisitors() {
             <ChevronRight size={18} className="text-nesthub-accent group-hover:translate-x-1 transition-transform" strokeWidth={3} />
          </button>
       </div>
+
+      {/* Approve Visitor Modal */}
+      <ApproveVisitorModal
+        isOpen={!!selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+        request={selectedRequest}
+        onApprove={(data) => {
+          console.log("Approved:", data);
+          setSelectedRequest(null);
+        }}
+        onReject={(data) => {
+          console.log("Rejected:", data);
+          setSelectedRequest(null);
+        }}
+      />
     </div>
   );
 }

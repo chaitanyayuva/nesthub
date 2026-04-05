@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Wrench,
   X
 } from "lucide-react";
 
@@ -24,7 +25,9 @@ export function Sidebar({ isOpen, onClose }) {
     { name: "Students", href: "/admin/students", icon: Users2 },
     { name: "Payments", href: "/admin/payments", icon: CreditCard },
     { name: "Complaints", href: "/admin/complaints", icon: MessageSquareWarning },
+    { name: "Maintenance", href: "/admin/maintenance", icon: Wrench },
     { name: "Visitors", href: "/admin/visitors", icon: UserSquare2 },
+    { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 
   return (

@@ -5,7 +5,8 @@ import { useAdminPayments } from "../../../hooks/usePayments";
 import { PaymentStats } from "../../../components/admin/PaymentStats";
 import { PaymentTable } from "../../../components/admin/PaymentTable";
 import { AdminModal } from "../../../components/admin/AdminModal";
-import { Download, Calendar, Filter, CheckCircle, Info, X, FileText, Share2, Settings } from "lucide-react";
+import { RecordPaymentModal } from "../../../components/admin/RecordPaymentModal";
+import { Download, Calendar, Filter, CheckCircle, Info, X, FileText, Share2, Settings, PlusCircle } from "lucide-react";
 
 export default function AdminPaymentsPage() {
   const { 
@@ -24,6 +25,7 @@ export default function AdminPaymentsPage() {
   // Modal States
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isInvoicingOpen, setIsInvoicingOpen] = useState(false);
 
@@ -71,6 +73,13 @@ export default function AdminPaymentsPage() {
           >
              <Download size={16} strokeWidth={2.5} />
              Export Report
+          </button>
+          <button 
+            onClick={() => setIsRecordPaymentOpen(true)}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2.5 bg-nesthub-accent text-white border border-nesthub-accent px-6 py-3.5 rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-2xl shadow-nesthub-accent/20 hover:bg-[#E59734] transition-all"
+          >
+             <PlusCircle size={16} strokeWidth={2.5} />
+             Record Payment
           </button>
           <button 
             onClick={() => setIsInvoicingOpen(true)}
@@ -239,6 +248,17 @@ export default function AdminPaymentsPage() {
            <p className="text-xs text-gray-400 leading-relaxed capitalize">Configure how the system handles monthly rent and utility billing for all active residents.</p>
         </div>
       </AdminModal>
+
+      {/* Record Payment Modal */}
+      <RecordPaymentModal
+        isOpen={isRecordPaymentOpen}
+        onClose={() => setIsRecordPaymentOpen(false)}
+        onSubmit={(data) => {
+          console.log("Recording payment:", data);
+          setToast({ message: `Payment of ₹${data.amount} recorded for ${data.student}!`, type: "success" });
+          setTimeout(() => setToast(null), 3000);
+        }}
+      />
 
     </div>
   );

@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useVisitors } from "../../../hooks/useVisitors";
+import { RequestVisitorPassModal } from "../../../components/student/RequestVisitorPassModal";
 import { UserPlus, UserCircle, Clock, QrCode, ShieldCheck, ChevronRight, Calendar, PlusCircle } from "lucide-react";
 
 export default function StudentVisitors() {
   const { pendingApprovals, historicalLogs } = useVisitors();
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   
   // Filter for current student "Rahul Kumar"
   const activePasses = pendingApprovals.filter(p => p.resident === "Rahul Kumar");
-  const studentHistory = historicalLogs.filter(h => h.resident === "Rahul Kumar" || h.visitor === "John Doe"); // Mocking some history
 
   return (
     <div className="p-6 pb-6 max-w-lg mx-auto w-full animate-fade-in transition-all duration-300">
@@ -18,7 +20,10 @@ export default function StudentVisitors() {
           <h1 className="font-heading text-3xl font-bold text-nesthub-primary tracking-tight">Visitor Pass</h1>
           <p className="text-gray-400 font-medium text-sm mt-2">Manage your guest entries securely.</p>
         </div>
-        <button className="bg-nesthub-primary text-white p-4 rounded-[22px] shadow-2xl shadow-nesthub-primary/20 hover:scale-110 active:scale-95 transition-all group">
+        <button
+          onClick={() => setIsRequestModalOpen(true)}
+          className="bg-nesthub-primary text-white p-4 rounded-[22px] shadow-2xl shadow-nesthub-primary/20 hover:scale-110 active:scale-95 transition-all group"
+        >
           <UserPlus size={24} className="group-hover:rotate-12 transition-transform" />
         </button>
       </div>
@@ -79,7 +84,10 @@ export default function StudentVisitors() {
                <p className="text-gray-500 font-bold text-sm">No Active Passes</p>
                <p className="text-gray-400 text-[10px] mt-1 font-bold uppercase tracking-wider">Your next guest will appear here</p>
             </div>
-            <button className="mt-4 flex items-center gap-2 text-nesthub-primary font-black text-[10px] uppercase tracking-widest hover:text-nesthub-accent transition-colors">
+            <button
+              onClick={() => setIsRequestModalOpen(true)}
+              className="mt-4 flex items-center gap-2 text-nesthub-primary font-black text-[10px] uppercase tracking-widest hover:text-nesthub-accent transition-colors"
+            >
                <PlusCircle size={14} />
                Request New
             </button>
@@ -113,6 +121,15 @@ export default function StudentVisitors() {
           ))}
         </div>
       </div>
+
+      {/* Request Visitor Pass Modal */}
+      <RequestVisitorPassModal
+        isOpen={isRequestModalOpen}
+        onClose={() => setIsRequestModalOpen(false)}
+        onSubmit={(data) => {
+          console.log("Visitor pass request:", data);
+        }}
+      />
     </div>
   );
 }

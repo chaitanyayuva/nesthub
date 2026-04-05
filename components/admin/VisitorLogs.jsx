@@ -2,7 +2,7 @@
 
 import { CheckCircle, XCircle, Clock, User, ArrowRight } from "lucide-react";
 
-export function VisitorRequests({ requests }) {
+export function VisitorRequests({ requests, onReview }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
        {requests.map((req) => (
@@ -40,10 +40,16 @@ export function VisitorRequests({ requests }) {
                </div>
 
                <div className="flex gap-3">
-                  <button className="flex-1 bg-nesthub-primary text-white py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all flex items-center justify-center gap-2">
-                     <CheckCircle size={14} /> Approve
+                  <button
+                    onClick={() => onReview?.(req)}
+                    className="flex-1 bg-nesthub-primary text-white py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all flex items-center justify-center gap-2"
+                  >
+                     <CheckCircle size={14} /> Review & Approve
                   </button>
-                  <button className="p-3.5 bg-gray-50 text-gray-400 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100">
+                  <button
+                    onClick={() => onReview?.(req)}
+                    className="p-3.5 bg-gray-50 text-gray-400 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100"
+                  >
                      <XCircle size={18} />
                   </button>
                </div>
@@ -53,6 +59,7 @@ export function VisitorRequests({ requests }) {
     </div>
   );
 }
+
 
 export function VisitorLogs({ logs }) {
   return (

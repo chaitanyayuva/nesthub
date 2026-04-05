@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useComplaints } from "../../../hooks/useComplaints";
 import { ComplaintQueue } from "../../../components/admin/ComplaintQueue";
+import { AssignComplaintModal } from "../../../components/admin/AssignComplaintModal";
 import { 
   Filter, 
   FastForward, 
@@ -10,6 +12,7 @@ import {
 
 export default function AdminComplaints() {
   const { complaints, activeTab, setActiveTab, stats } = useComplaints();
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   return (
     <div className="animate-fade-in max-w-[1400px] mx-auto px-4 sm:px-0">
@@ -52,7 +55,10 @@ export default function AdminComplaints() {
 
       {/* Grid of Complaints */}
       <div className="min-h-[400px]">
-         <ComplaintQueue complaints={complaints} />
+         <ComplaintQueue
+           complaints={complaints}
+           onAssign={(complaint) => setSelectedComplaint(complaint)}
+         />
       </div>
 
       {/* Summary Footer */}
@@ -74,6 +80,17 @@ export default function AdminComplaints() {
          
          <MessageSquareWarning size={180} className="absolute -bottom-10 -right-10 text-white/5 opacity-40 rotate-12 hidden lg:block pointer-events-none" />
       </div>
+
+      {/* Assign Complaint Modal */}
+      <AssignComplaintModal
+        isOpen={!!selectedComplaint}
+        onClose={() => setSelectedComplaint(null)}
+        complaint={selectedComplaint}
+        onSubmit={(data) => {
+          console.log("Assign complaint:", data);
+          setSelectedComplaint(null);
+        }}
+      />
     </div>
   );
 }
