@@ -1,11 +1,11 @@
 {
-  "appId": "com.nesthub.student",
-  "appName": "NestHub Student",
+  "appId": "com.nesthub.admin",
+  "appName": "NestHub Admin",
   "webDir": "out",
   "server": {
     "androidScheme": "https"
   },
   "android": {
-    "path": "android-student"
+    "path": "android-admin"
   }
 }
