@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "../../../hooks/useAuth";
 import Link from "next/link";
 import {
   HiOutlineEye,
@@ -40,7 +41,14 @@ function Background() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialRole = searchParams.get("role") || "student";
+  
+  const appTarget = process.env.NEXT_PUBLIC_APP_TARGET || "web";
+  
+  const initialRole = appTarget === "student" 
+    ? "student" 
+    : appTarget === "admin" 
+      ? "admin" 
+      : (searchParams.get("role") || "student");
 
   const [role, setRole] = useState(initialRole);
   const [email, setEmail] = useState("");
@@ -48,6 +56,8 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,18 +68,37 @@ function LoginForm() {
       return;
     }
 
-    setLoading(true);
-    // Simulate async login — replace with real auth call later
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
+    // Force application target roles for mobile builds
+    let loginRole = role;
+    if (appTarget === "student") loginRole = "student";
+    if (appTarget === "admin") loginRole = "admin";
 
-    // Route based on role back to the respective dashboards
-    if (role === "admin") {
-      router.push("/admin");
-    } else {
-      router.push("/student");
+    setLoading(true);
+    try {
+      const userData = await login(email, password, loginRole || undefined);
+      
+      // Cross-verify role against build target
+      if (appTarget === "student" && userData.role !== "student") {
+        throw new Error("This application is only for Students. Please use the NestHub Web portal or Admin App.");
+      }
+      if (appTarget === "admin" && userData.role !== "admin") {
+        throw new Error("This application is only for Admins. Please use the NestHub Web portal or Student App.");
+      }
+
+      if (userData.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/student");
+      }
+    } catch (err) {
+      setError(
+        err.message || err.response?.data?.message || "Invalid email or password. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -90,9 +119,15 @@ function LoginForm() {
         <div className="glass-card w-full max-w-md p-8 animate-slide-up">
           {/* Header */}
           <div className="mb-7">
-            <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
+            <h1 className="text-2xl font-bold text-white mb-1">
+              {appTarget === "student" ? "Student Portal" : appTarget === "admin" ? "Admin Portal" : "Welcome back"}
+            </h1>
             <p className="text-sm text-slate-400">
-              Sign in to manage your hostel experience
+              {appTarget === "student" 
+                ? "Sign in to manage your student hostel experience" 
+                : appTarget === "admin" 
+                  ? "Sign in to manage your hostellers" 
+                  : "Sign in to manage your hostel experience"}
             </p>
           </div>
 

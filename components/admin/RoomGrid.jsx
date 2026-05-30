@@ -6,7 +6,7 @@ export function RoomGrid({ rooms, getStatusColor }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
        {rooms.map((room) => (
-         <RoomCard key={room.id} room={room} getStatusColor={getStatusColor} />
+         <RoomCard key={room._id} room={room} getStatusColor={getStatusColor} />
        ))}
     </div>
   );
@@ -21,21 +21,21 @@ export function RoomCard({ room, getStatusColor }) {
           </div>
           <div className="text-right">
              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Room</p>
-             <h4 className="text-2xl font-heading font-black text-nesthub-primary leading-none tracking-tight">{room.id}</h4>
+             <h4 className="text-2xl font-heading font-black text-nesthub-primary leading-none tracking-tight">{room.number}</h4>
           </div>
        </div>
        
        <div className="space-y-4">
           <div className="flex justify-between items-center text-[10px] uppercase tracking-wider font-bold text-gray-400">
              <span>Occupancy</span>
-             <span className="text-nesthub-primary font-black">{room.occupied}/{room.beds} Beds</span>
+             <span className="text-nesthub-primary font-black">{(room.occupants || 0)}/{(room.capacity || 2)} Beds</span>
           </div>
           
           <div className="h-2 bg-gray-50 rounded-full overflow-hidden flex gap-0.5">
-             {Array.from({ length: room.beds }).map((_, i) => (
+             {Array.from({ length: (room.capacity || 2) }).map((_, i) => (
                <div 
                  key={i} 
-                 className={`flex-1 transition-all duration-700 ${i < room.occupied ? getStatusColor(room.status).split(' ')[0] : 'bg-gray-200'}`}
+                 className={`flex-1 transition-all duration-700 ${i < (room.occupants || 0) ? getStatusColor(room.status).split(' ')[0] : 'bg-gray-200'}`}
                ></div>
              ))}
           </div>

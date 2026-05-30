@@ -1,0 +1,11 @@
+{
+  "appId": "com.nesthub.admin",
+  "appName": "NestHub Admin",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "path": "android-admin"
+  }
+}

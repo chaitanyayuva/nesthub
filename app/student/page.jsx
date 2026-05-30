@@ -7,11 +7,27 @@ import { useNotices } from "../../hooks/useNotices";
 import { CreditCard, AlertCircle, UserPlus, FileBadge2, ChevronRight, Speaker } from "lucide-react";
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { totalAmount } = usePayments();
   const { allNotices } = useNotices();
   
   const latestNotice = allNotices[0];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-nesthub-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">
+        Please log in to view your dashboard.
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 pb-6 max-w-lg mx-auto w-full transition-all duration-300">
@@ -19,10 +35,10 @@ export default function StudentDashboard() {
       <header className="mb-8 flex justify-between items-center animate-fade-in px-2">
         <div>
           <p className="text-gray-400 font-semibold uppercase tracking-widest text-[10px] mb-1">Welcome back,</p>
-          <h1 className="font-heading text-3xl font-bold text-nesthub-primary tracking-tight">{user.name}</h1>
+          <h1 className="font-heading text-3xl font-bold text-nesthub-primary tracking-tight">{user?.name}</h1>
         </div>
         <div className="w-14 h-14 bg-white rounded-2xl overflow-hidden border-2 border-white shadow-xl shadow-nesthub-primary/10 shrink-0 transform hover:rotate-3 transition-transform">
-          <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+          <img src={user?.avatar || "/default-avatar.png"} alt="Profile" className="w-full h-full object-cover" />
         </div>
       </header>
 

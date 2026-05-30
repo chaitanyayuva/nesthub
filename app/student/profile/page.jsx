@@ -4,7 +4,23 @@ import { useAuth } from "../../../hooks/useAuth";
 import { QrCode, MapPin, Building2, UserCircle2, Share2, Download, ShieldCheck } from "lucide-react";
 
 export default function StudentProfile() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-nesthub-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">
+        Please log in to view your profile.
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 pb-6 max-w-lg mx-auto w-full animate-fade-in transition-all duration-300">

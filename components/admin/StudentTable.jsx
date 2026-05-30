@@ -4,11 +4,17 @@ import { Users2, Mail, Phone, MoreHorizontal, ArrowUpRight } from "lucide-react"
 
 export function StudentTable({ students }) {
   const getStatusBadge = (status) => {
-    switch(status) {
-      case "Paid": return "bg-green-50 text-green-600 ring-1 ring-green-100";
-      case "Pending": return "bg-orange-50 text-orange-600 ring-1 ring-orange-100";
-      case "Overdue": return "bg-red-50 text-red-600 ring-1 ring-red-100";
-      default: return "bg-gray-50 text-gray-400";
+    switch(status?.toLowerCase()) {
+      case "active":
+      case "paid": 
+        return "bg-green-50 text-green-600 ring-1 ring-green-100";
+      case "inactive":
+      case "pending": 
+        return "bg-orange-50 text-orange-600 ring-1 ring-orange-100";
+      case "overdue": 
+        return "bg-red-50 text-red-600 ring-1 ring-red-100";
+      default: 
+        return "bg-gray-50 text-gray-400";
     }
   };
 
@@ -28,20 +34,20 @@ export function StudentTable({ students }) {
         <tbody>
           {students.map((student, idx) => (
             <tr 
-              key={student.id} 
+              key={student.rollNo || student._id} 
               className={`group hover:bg-gray-50/50 transition-colors ${idx !== students.length - 1 ? 'border-b border-gray-50' : ''}`}
             >
               <td className="px-8 py-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-nesthub-primary/5 text-nesthub-primary flex items-center justify-center font-heading font-black border border-gray-100 group-hover:bg-nesthub-primary group-hover:text-white group-hover:scale-105 transition-all duration-300 uppercase">
-                    {student.name.split(' ')[0][0]}{student.name.split(' ')[1]?.[0] || ""}
+                    {(student.fullName || "S").split(' ')[0]?.[0] || ""}{(student.fullName || "").split(' ')[1]?.[0] || ""}
                   </div>
                   <div>
                     <p className="font-bold text-sm text-nesthub-primary flex items-center gap-2">
-                      {student.name}
+                      {student.fullName}
                       <ArrowUpRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </p>
-                    <p className="text-[10px] font-mono font-semibold text-gray-300 tracking-tight uppercase">{student.id}</p>
+                    <p className="text-[10px] font-mono font-semibold text-gray-300 tracking-tight uppercase">{student.rollNo}</p>
                   </div>
                 </div>
               </td>
@@ -54,15 +60,17 @@ export function StudentTable({ students }) {
                 </div>
               </td>
               <td className="px-8 py-6">
-                <span className="text-sm font-black text-nesthub-primary bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 tracking-tighter">{student.room}</span>
+                <span className="text-sm font-black text-nesthub-primary bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 tracking-tighter">{student.roomNo || "N/A"}</span>
               </td>
               <td className="px-8 py-6">
-                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider whitespace-nowrap ${getStatusBadge(student.rentStatus)}`}>
-                  {student.rentStatus}
+                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider whitespace-nowrap ${getStatusBadge(student.status)}`}>
+                  {student.status === 'active' ? 'Active' : 'Inactive'}
                 </span>
               </td>
               <td className="px-8 py-6">
-                <p className="text-xs font-bold text-gray-500 whitespace-nowrap">{student.joinDate}</p>
+                <p className="text-xs font-bold text-gray-500 whitespace-nowrap">
+                  {student.checkInDate ? new Date(student.checkInDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A"}
+                </p>
               </td>
               <td className="px-8 py-6 text-right">
                 <div className="flex items-center justify-end gap-2">

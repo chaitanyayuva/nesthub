@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import api from "../lib/api";
 
 export function useRooms() {
-  const [selectedFloor, setSelectedFloor] = useState(0);
+  const [floors, setFloors] = useState([]);
   const [rooms, setRooms] = useState([]);
-
-  const floors = [
-    { name: "Ground Floor", id: 0 },
-    { name: "1st Floor", id: 1 },
-    { name: "2nd Floor", id: 2 },
-    { name: "3rd Floor", id: 3 },
-  ];
+  const [selectedFloor, setSelectedFloor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const statuses = [
     { label: "Fully Occupied", color: "bg-blue-500", desc: "No space left" },
@@ -20,21 +17,50 @@ export function useRooms() {
     { label: "Maintenance", color: "bg-red-500", desc: "Repairs in progress" },
   ];
 
+  // Fetch floor list on mount
   useEffect(() => {
-    // Generate stable mock data based on floor to avoid hydration issues
-    setRooms(Array.from({ length: 11 }, (_, i) => ({
-      id: `${selectedFloor}${101 + i}`,
-      status: ["Occupied", "Partial", "Available", "Maintenance"][(i + selectedFloor) % 4],
-      beds: 3,
-      occupied: (i + selectedFloor) % 4,
-    })));
+    const fetchFloors = async () => {
+      try {
+        const res = await api.get("/api/rooms/floors");
+        const floorList = res.data || [];
+        setFloors(floorList);
+        if (floorList.length > 0) {
+          setSelectedFloor(floorList[0].id);
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load floors");
+      }
+    };
+    fetchFloors();
+  }, []);
+
+  // Fetch rooms whenever floor changes
+  const fetchRooms = useCallback(async () => {
+    if (!selectedFloor) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get("/api/rooms", { params: { floorId: selectedFloor } });
+      setRooms(res.data || []);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load rooms");
+    } finally {
+      setLoading(false);
+    }
   }, [selectedFloor]);
+
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   return {
     rooms,
     floors,
     selectedFloor,
     setSelectedFloor,
-    statuses
+    statuses,
+    loading,
+    error,
+    refetch: fetchRooms,
   };
 }

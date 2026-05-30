@@ -6,14 +6,35 @@ import { CreditCard, History, ChevronRight, ReceiptText, AlertTriangle, Zap, Hom
 import { ConfirmPaymentModal } from "../../../components/student/ConfirmPaymentModal";
 
 export default function StudentPayments() {
-  const { currentDues, totalAmount, history } = usePayments();
+  const { currentDues, totalAmount, history, processPayment } = usePayments();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState(null);
 
   const getDuesIcon = (type) => {
     switch(type) {
       case "Rent": return HomeIcon;
       case "Electricity": return Zap;
       default: return AlertTriangle;
+    }
+  };
+
+  const handleConfirm = async () => {
+    setPaying(true);
+    setPayError(null);
+    try {
+      for (const due of currentDues) {
+        await processPayment({
+          invoiceId: due.invoiceId,
+          amount: due.amount,
+          method: "UPI"
+        });
+      }
+      setIsConfirmOpen(false);
+    } catch (err) {
+      setPayError(err.response?.data?.message || "Failed to process payment");
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -27,6 +48,12 @@ export default function StudentPayments() {
         </button>
       </div>
 
+      {payError && (
+        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 text-sm font-medium">
+          {payError}
+        </div>
+      )}
+
       {/* Current Dues Card */}
       <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm mb-10 relative overflow-hidden group hover:shadow-2xl hover:shadow-nesthub-primary/5 transition-all duration-500">
         <div className="flex items-center gap-3 mb-8">
@@ -37,20 +64,24 @@ export default function StudentPayments() {
         </div>
 
         <div className="space-y-5 mb-10">
-          {currentDues.map((due) => {
-            const Icon = getDuesIcon(due.type);
-            return (
-              <div key={due.id} className="flex justify-between items-center group/item">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-2xl transition-transform group-hover/item:scale-110 ${due.color}`}>
-                    <Icon size={20} />
+          {currentDues.length === 0 ? (
+            <p className="text-sm font-medium text-gray-400 text-center py-4">No current dues</p>
+          ) : (
+            currentDues.map((due) => {
+              const Icon = getDuesIcon(due.type);
+              return (
+                <div key={due.id} className="flex justify-between items-center group/item">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-2xl transition-transform group-hover/item:scale-110 ${due.color}`}>
+                      <Icon size={20} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-500">{due.type}</span>
                   </div>
-                  <span className="text-sm font-bold text-gray-500">{due.type}</span>
+                  <span className="font-heading font-black text-nesthub-primary text-base tracking-tight">₹{due.amount.toLocaleString()}</span>
                 </div>
-                <span className="font-heading font-black text-nesthub-primary text-base tracking-tight">₹{due.amount.toLocaleString()}</span>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
           
           <div className="pt-6 border-t border-gray-100 flex justify-between items-center">
             <span className="font-heading font-black text-[10px] uppercase tracking-widest text-gray-400">Total Payable</span>
@@ -60,7 +91,8 @@ export default function StudentPayments() {
 
         <button
           onClick={() => setIsConfirmOpen(true)}
-          className="w-full bg-nesthub-accent hover:bg-[#E59734] text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl shadow-nesthub-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+          disabled={currentDues.length === 0}
+          className="w-full bg-nesthub-accent hover:bg-[#E59734] text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl shadow-nesthub-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
         >
           Process Payment
           <ChevronRight size={18} strokeWidth={3} />
@@ -75,28 +107,32 @@ export default function StudentPayments() {
         </div>
 
         <div className="grid grid-cols-1 gap-4">
-          {history.map((item, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white p-5 rounded-[32px] border border-gray-100 shadow-sm flex justify-between items-center hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all group cursor-pointer"
-            >
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 group-hover:bg-nesthub-primary/5 group-hover:text-nesthub-primary transition-all duration-300">
-                  <CreditCard size={20} />
+          {history.length === 0 ? (
+            <p className="text-sm font-medium text-gray-400 text-center py-4">No payment history</p>
+          ) : (
+            history.map((item, idx) => (
+              <div 
+                key={idx} 
+                className="bg-white p-5 rounded-[32px] border border-gray-100 shadow-sm flex justify-between items-center hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all group cursor-pointer"
+              >
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 group-hover:bg-nesthub-primary/5 group-hover:text-nesthub-primary transition-all duration-300">
+                    <CreditCard size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-nesthub-primary tracking-tight">{item.month}</h4>
+                    <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{item.date}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-nesthub-primary tracking-tight">{item.month}</h4>
-                  <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{item.date}</p>
+                <div className="text-right">
+                  <p className="font-heading font-black text-sm text-nesthub-primary mb-1.5 tracking-tight">₹{item.amount.toLocaleString()}</p>
+                  <span className="bg-[#DEF7EC] text-[#03543F] px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
+                    {item.status}
+                  </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-heading font-black text-sm text-nesthub-primary mb-1.5 tracking-tight">₹{item.amount.toLocaleString()}</p>
-                <span className="bg-[#DEF7EC] text-[#03543F] px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
-                  {item.status}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -118,9 +154,7 @@ export default function StudentPayments() {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         dues={currentDues}
-        onConfirm={() => {
-          console.log("Payment confirmed");
-        }}
+        onConfirm={handleConfirm}
       />
     </div>
   );

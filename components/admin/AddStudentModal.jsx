@@ -8,10 +8,10 @@ export function AddStudentModal({ isOpen, onClose, onSubmit }) {
     fullName: "",
     email: "",
     phone: "",
-    college: "",
-    room: "",
-    rent: "",
-    checkIn: "",
+    institution: "",
+    roomNo: "",
+    rentAmount: "",
+    checkInDate: "",
     guardianName: "",
     guardianPhone: "",
     documents: null,
@@ -123,8 +123,8 @@ export function AddStudentModal({ isOpen, onClose, onSubmit }) {
                     College / University <span className="text-red-400">*</span>
                   </label>
                   <input
-                    name="college"
-                    value={form.college}
+                    name="institution"
+                    value={form.institution}
                     onChange={handleChange}
                     required
                     placeholder="Delhi University"
@@ -145,8 +145,8 @@ export function AddStudentModal({ isOpen, onClose, onSubmit }) {
                     Room Assignment <span className="text-red-400">*</span>
                   </label>
                   <select
-                    name="room"
-                    value={form.room}
+                    name="roomNo"
+                    value={form.roomNo}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-nesthub-primary/20 focus:border-nesthub-primary transition-all bg-white"
@@ -162,9 +162,9 @@ export function AddStudentModal({ isOpen, onClose, onSubmit }) {
                     Monthly Rent (₹) <span className="text-red-400">*</span>
                   </label>
                   <input
-                    name="rent"
+                    name="rentAmount"
                     type="number"
-                    value={form.rent}
+                    value={form.rentAmount}
                     onChange={handleChange}
                     required
                     placeholder="8000"
@@ -176,9 +176,9 @@ export function AddStudentModal({ isOpen, onClose, onSubmit }) {
                     Check-in Date <span className="text-red-400">*</span>
                   </label>
                   <input
-                    name="checkIn"
+                    name="checkInDate"
                     type="date"
-                    value={form.checkIn}
+                    value={form.checkInDate}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-nesthub-primary/20 focus:border-nesthub-primary transition-all"

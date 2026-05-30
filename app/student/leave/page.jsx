@@ -1,35 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLeaves } from "../../../hooks/useLeaves";
 import { 
   Calendar, Clock, FileText, ArrowLeft, Send, 
-  ChevronRight, AlertTriangle, Home, Plane, Stethoscope, Users2 
+  ChevronRight, AlertTriangle, Home, Plane, Stethoscope, Users2, Loader2, CheckCircle2
 } from "lucide-react";
 
 const REASONS = [
-  { id: "home", icon: Home, label: "Home Visit", color: "bg-green-50 text-green-600" },
-  { id: "medical", icon: Stethoscope, label: "Medical", color: "bg-red-50 text-red-600" },
-  { id: "travel", icon: Plane, label: "Travel / Trip", color: "bg-blue-50 text-blue-600" },
-  { id: "family", icon: Users2, label: "Family Event", color: "bg-purple-50 text-purple-600" },
+  { id: "Home Visit", icon: Home, label: "Home Visit", color: "bg-green-50 text-green-600" },
+  { id: "Medical", icon: Stethoscope, label: "Medical", color: "bg-red-50 text-red-600" },
+  { id: "Travel", icon: Plane, label: "Travel / Trip", color: "bg-blue-50 text-blue-600" },
+  { id: "Family Event", icon: Users2, label: "Family Event", color: "bg-purple-50 text-purple-600" },
 ];
-
-const MOCK_LEAVE_HISTORY = [
-  { id: "LV001", reason: "Home Visit", from: "Apr 1", to: "Apr 3", days: 3, status: "Approved" },
-  { id: "LV002", reason: "Medical", from: "Mar 20", to: "Mar 21", days: 2, status: "Approved" },
-  { id: "LV003", reason: "Travel / Trip", from: "Mar 5", to: "Mar 8", days: 4, status: "Rejected" },
-];
-
-const STATUS_COLORS = {
-  Approved: "bg-green-50 text-green-600 border-green-100",
-  Rejected: "bg-red-50 text-red-600 border-red-100",
-  Pending: "bg-orange-50 text-orange-600 border-orange-100",
-};
 
 export default function StudentLeave() {
-  const [reason, setReason] = useState("home");
+  const { leaveHistory, submitLeave, loading, error } = useLeaves();
+  const [reason, setReason] = useState("Home Visit");
   const [form, setForm] = useState({ fromDate: "", toDate: "", details: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -39,10 +30,27 @@ export default function StudentLeave() {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    setSubmitting(true);
+    setSubmitError(null);
+    setSuccess(false);
+
+    try {
+      await submitLeave({
+        reason,
+        fromDate: form.fromDate,
+        toDate: form.toDate,
+        details: form.details,
+      });
+      setSuccess(true);
+      setForm({ fromDate: "", toDate: "", details: "" });
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || "Failed to submit leave request");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -53,8 +61,13 @@ export default function StudentLeave() {
         <p className="text-gray-400 font-medium text-sm mt-2">Apply for hostel leave with all necessary details.</p>
       </div>
 
-      {/* Success Message */}
-      {submitted && (
+      {/* Messages */}
+      {submitError && (
+        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 text-sm font-medium">
+          {submitError}
+        </div>
+      )}
+      {success && (
         <div className="mb-6 bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center gap-3 animate-slide-up">
           <div className="bg-green-500 p-2 rounded-xl text-white"><Send size={16} /></div>
           <div>
@@ -85,7 +98,7 @@ export default function StudentLeave() {
                 <div className={`p-3 rounded-2xl ${reason === id ? "bg-white/10" : color}`}>
                   <Icon size={22} />
                 </div>
-                <span className="text-[11px] font-black uppercase tracking-wider">{label}</span>
+                <span className="text-[11px] font-black uppercase tracking-wider text-center">{label}</span>
               </button>
             ))}
           </div>
@@ -158,34 +171,57 @@ export default function StudentLeave() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-nesthub-primary text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-2xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all active:scale-95 flex items-center justify-center gap-3"
+          disabled={submitting}
+          className="w-full bg-nesthub-primary text-white py-5 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-2xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70"
         >
-          Submit Leave Request
-          <ChevronRight size={18} strokeWidth={3} />
+          {submitting ? (
+             <Loader2 size={18} strokeWidth={3} className="animate-spin" />
+          ) : (
+            <>Submit Leave Request <ChevronRight size={18} strokeWidth={3} /></>
+          )}
         </button>
       </form>
 
       {/* Past Leave History */}
       <div className="mt-12 px-2">
         <h2 className="font-heading font-black text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-6">Past Applications</h2>
-        <div className="space-y-4">
-          {MOCK_LEAVE_HISTORY.map((leave) => (
-            <div
-              key={leave.id}
-              className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-5 flex items-center justify-between hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all"
-            >
-              <div>
-                <p className="font-bold text-sm text-nesthub-primary">{leave.reason}</p>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">
-                  {leave.from} → {leave.to} · {leave.days} days
-                </p>
+        
+        {loading && (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 size={24} className="animate-spin text-nesthub-primary" />
+          </div>
+        )}
+        
+        {error && !loading && (
+          <div className="text-center py-4 text-red-500 font-semibold">{error}</div>
+        )}
+
+        {!loading && !error && (
+          <div className="space-y-4">
+            {leaveHistory.length === 0 ? (
+              <div className="text-center py-10 bg-gray-50 rounded-[32px] border border-dashed border-gray-200">
+                <p className="text-gray-400 text-sm font-bold">No leave history found</p>
               </div>
-              <span className={`px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${STATUS_COLORS[leave.status]}`}>
-                {leave.status}
-              </span>
-            </div>
-          ))}
-        </div>
+            ) : (
+              leaveHistory.map((leave) => (
+                <div
+                  key={leave.id}
+                  className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-5 flex items-center justify-between hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all"
+                >
+                  <div>
+                    <p className="font-bold text-sm text-nesthub-primary">{leave.reason}</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">
+                      {leave.from} → {leave.to} · {leave.days} days
+                    </p>
+                  </div>
+                  <span className={`px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${leave.statusColor}`}>
+                    {leave.status}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

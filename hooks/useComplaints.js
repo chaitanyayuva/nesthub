@@ -1,33 +1,95 @@
 "use client";
 
-import { useState, useMemo } from "react";
-
-const MOCK_COMPLAINTS = [
-  { id: "C-1024", student: "Rahul Kumar", room: "302-B", category: "Plumbing", subject: "Leaking tap in bathroom", time: "2 hours ago", priority: "P1", status: "Open" },
-  { id: "C-1022", student: "Ankit Sharma", room: "105-A", category: "Electrical", subject: "Fan not working", time: "5 hours ago", priority: "P2", status: "In Progress", assignedTo: "Rajesh (Electrician)" },
-  { id: "C-1018", student: "Vikram Singh", room: "210-C", category: "Furniture", subject: "Broken chair leg", time: "1 day ago", priority: "P3", status: "Resolved" },
-  { id: "C-1025", student: "Deepak Rawat", room: "202", category: "Plumbing", subject: "No water in flush", time: "20 mins ago", priority: "P1", status: "Open" },
-];
+import { useState, useEffect, useCallback } from "react";
+import api from "../lib/api";
 
 export function useComplaints() {
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Open");
+  const [stats, setStats] = useState({
+    open: 0,
+    inProgress: 0,
+    resolved: 0,
+    avgResponse: "—",
+    completionRate: "—",
+  });
 
-  const filteredComplaints = useMemo(() => {
-    return MOCK_COMPLAINTS.filter(c => c.status === activeTab);
+  const fetchComplaints = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch all to compute stats, then filter client-side for tab
+      const [openRes, inProgressRes, resolvedRes] = await Promise.all([
+        api.get("/api/complaints", { params: { status: "Open" } }),
+        api.get("/api/complaints", { params: { status: "Assigned" } }),
+        api.get("/api/complaints", { params: { status: "Resolved" } }),
+      ]);
+
+      const openList = openRes.data || [];
+      const inProgressList = inProgressRes.data || [];
+      const resolvedList = resolvedRes.data || [];
+
+      setStats({
+        open: openList.length,
+        inProgress: inProgressList.length,
+        resolved: resolvedList.length,
+        avgResponse: "2.4 Hours",
+        completionRate:
+          resolvedList.length + openList.length + inProgressList.length > 0
+            ? `${Math.round(
+                (resolvedList.length /
+                  (resolvedList.length + openList.length + inProgressList.length)) *
+                  100
+              )}%`
+            : "0%",
+      });
+
+      // Set current tab complaints
+      const tabMap = { Open: openList, "In Progress": inProgressList, Resolved: resolvedList };
+      setComplaints(tabMap[activeTab] || openList);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load complaints");
+    } finally {
+      setLoading(false);
+    }
   }, [activeTab]);
 
-  const stats = {
-    open: MOCK_COMPLAINTS.filter(c => c.status === "Open").length,
-    inProgress: MOCK_COMPLAINTS.filter(c => c.status === "In Progress").length,
-    resolved: MOCK_COMPLAINTS.filter(c => c.status === "Resolved").length,
-    avgResponse: "2.4 Hours",
-    completionRate: "94%"
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
+
+  const createComplaint = async (formData) => {
+    const res = await api.post("/api/complaints", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    fetchComplaints();
+    return res.data;
+  };
+
+  const assignComplaint = async (ticketId, data) => {
+    const res = await api.put(`/api/complaints/${ticketId}/assign`, data);
+    fetchComplaints();
+    return res.data;
+  };
+
+  const updateStatus = async (ticketId, status) => {
+    const res = await api.put(`/api/complaints/${ticketId}/status`, { status });
+    fetchComplaints();
+    return res.data;
   };
 
   return {
-    complaints: filteredComplaints,
+    complaints,
+    loading,
+    error,
     activeTab,
     setActiveTab,
-    stats
+    stats,
+    refetch: fetchComplaints,
+    createComplaint,
+    assignComplaint,
+    updateStatus,
   };
 }

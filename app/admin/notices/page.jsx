@@ -1,16 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { BellRing, Plus, Search, AlertTriangle, Info, CheckCircle } from "lucide-react";
+import { useNotices } from "../../../hooks/useNotices";
+import { BellRing, Plus, Search, AlertTriangle, Info, CheckCircle, Loader2 } from "lucide-react";
 import { PostNoticeModal } from "../../../components/admin/PostNoticeModal";
-
-const MOCK_NOTICES = [
-  { id: "N001", title: "Water Supply Disruption on Saturday", category: "Maintenance", priority: "High", date: "Apr 4, 2025", sendTo: "All Students", active: true },
-  { id: "N002", title: "Monthly Rent Due - April 2025", category: "Payment", priority: "High", date: "Apr 1, 2025", sendTo: "All Students", active: true },
-  { id: "N003", title: "Cultural Fest Registration Open", category: "Event", priority: "Normal", date: "Mar 28, 2025", sendTo: "All Students", active: true },
-  { id: "N004", title: "New Visitor Policy Effective April 15", category: "Rule", priority: "Normal", date: "Mar 25, 2025", sendTo: "All Students", active: false },
-  { id: "N005", title: "Hostel Day Celebration — April 20", category: "Event", priority: "Low", date: "Mar 20, 2025", sendTo: "All Students", active: false },
-];
 
 const CATEGORY_COLORS = {
   General: "bg-gray-100 text-gray-600",
@@ -28,25 +21,27 @@ const PRIORITY_COLORS = {
 };
 
 export default function AdminNotices() {
+  const { allNotices, loading, error, postNotice } = useNotices();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [notices, setNotices] = useState(MOCK_NOTICES);
   const [searchTerm, setSearchTerm] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState(null);
 
-  const filtered = notices.filter((n) =>
-    n.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = allNotices.filter((n) =>
+    (n.title || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handlePost = (data) => {
-    const newNotice = {
-      id: `N00${notices.length + 1}`,
-      title: data.title,
-      category: data.category,
-      priority: data.priority,
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      sendTo: data.sendTo,
-      active: true,
-    };
-    setNotices((prev) => [newNotice, ...prev]);
+  const handlePost = async (data) => {
+    setPosting(true);
+    setPostError(null);
+    try {
+      await postNotice(data);
+      setIsPostModalOpen(false);
+    } catch (err) {
+      setPostError(err.response?.data?.message || "Failed to post notice");
+    } finally {
+      setPosting(false);
+    }
   };
 
   return (
@@ -87,10 +82,10 @@ export default function AdminNotices() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
         {[
-          { label: "Total Notices", value: notices.length, icon: BellRing, color: "text-nesthub-primary bg-nesthub-primary/10" },
-          { label: "Active", value: notices.filter(n => n.active).length, icon: CheckCircle, color: "text-green-600 bg-green-50" },
-          { label: "High Priority", value: notices.filter(n => n.priority === "High").length, icon: AlertTriangle, color: "text-red-500 bg-red-50" },
-          { label: "Sent Today", value: 2, icon: Info, color: "text-blue-500 bg-blue-50" },
+          { label: "Total Notices", value: allNotices.length, icon: BellRing, color: "text-nesthub-primary bg-nesthub-primary/10" },
+          { label: "Active", value: allNotices.filter(n => !n.isExpired).length, icon: CheckCircle, color: "text-green-600 bg-green-50" },
+          { label: "High Priority", value: allNotices.filter(n => n.priority === "High").length, icon: AlertTriangle, color: "text-red-500 bg-red-50" },
+          { label: "Sent Today", value: allNotices.filter(n => new Date(n.createdAt).toDateString() === new Date().toDateString()).length, icon: Info, color: "text-blue-500 bg-blue-50" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 flex items-center gap-4 hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all">
             <div className={`p-3 rounded-2xl ${color}`}>
@@ -104,69 +99,81 @@ export default function AdminNotices() {
         ))}
       </div>
 
+      {/* Loading & Error States */}
+      {loading && (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 size={32} className="animate-spin text-nesthub-primary" />
+        </div>
+      )}
+      {error && !loading && (
+        <div className="text-center py-16 text-red-500 font-semibold">{error}</div>
+      )}
+
       {/* Notice List */}
-      <div className="space-y-4">
-        {filtered.length === 0 ? (
-          <div className="bg-white rounded-[40px] border border-dashed border-gray-200 p-20 flex flex-col items-center justify-center text-center">
-            <div className="bg-gray-50 p-6 rounded-3xl text-gray-200 mb-4">
-              <BellRing size={48} strokeWidth={1} />
+      {!loading && !error && (
+        <div className="space-y-4">
+          {filtered.length === 0 ? (
+            <div className="bg-white rounded-[40px] border border-dashed border-gray-200 p-20 flex flex-col items-center justify-center text-center">
+              <div className="bg-gray-50 p-6 rounded-3xl text-gray-200 mb-4">
+                <BellRing size={48} strokeWidth={1} />
+              </div>
+              <p className="text-gray-500 font-bold">No notices found</p>
+              <p className="text-gray-400 text-sm mt-1">Post a new notice using the button above.</p>
             </div>
-            <p className="text-gray-500 font-bold">No notices found</p>
-            <p className="text-gray-400 text-sm mt-1">Post a new notice using the button above.</p>
-          </div>
-        ) : (
-          filtered.map((notice) => (
-            <div
-              key={notice.id}
-              className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all group"
-            >
-              {/* Icon */}
-              <div className={`p-3 rounded-2xl shrink-0 ${CATEGORY_COLORS[notice.category] || "bg-gray-100 text-gray-500"}`}>
-                <BellRing size={20} />
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                  <h3 className="font-bold text-sm text-nesthub-primary truncate">{notice.title}</h3>
-                  {notice.active && (
-                    <span className="px-2.5 py-0.5 bg-green-50 text-green-600 border border-green-100 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0">
-                      Active
-                    </span>
-                  )}
+          ) : (
+            filtered.map((notice) => (
+              <div
+                key={notice.id}
+                className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 hover:shadow-xl hover:shadow-nesthub-primary/5 transition-all group"
+              >
+                {/* Icon */}
+                <div className={`p-3 rounded-2xl shrink-0 ${CATEGORY_COLORS[notice.category] || "bg-gray-100 text-gray-500"}`}>
+                  <BellRing size={20} />
                 </div>
-                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-wider text-gray-400 flex-wrap">
-                  <span className={PRIORITY_COLORS[notice.priority]}>{notice.priority} Priority</span>
-                  <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                  <span>{notice.category}</span>
-                  <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                  <span>{notice.sendTo}</span>
-                  <span className="w-1 h-1 bg-gray-200 rounded-full" />
-                  <span>{notice.date}</span>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                    <h3 className="font-bold text-sm text-nesthub-primary truncate">{notice.title}</h3>
+                    {!notice.isExpired && (
+                      <span className="px-2.5 py-0.5 bg-green-50 text-green-600 border border-green-100 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-wider text-gray-400 flex-wrap">
+                    <span className={PRIORITY_COLORS[notice.priority]}>{notice.priority} Priority</span>
+                    <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                    <span>{notice.category}</span>
+                    <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                    <span>{notice.audience}</span>
+                    <span className="w-1 h-1 bg-gray-200 rounded-full" />
+                    <span>{notice.time}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 shrink-0">
+                  <button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 border border-gray-100 rounded-xl hover:text-nesthub-primary hover:bg-gray-50 transition-all">
+                    Edit
+                  </button>
+                  <button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 border border-red-50 rounded-xl hover:bg-red-50 transition-all">
+                    Delete
+                  </button>
                 </div>
               </div>
-
-              {/* Actions */}
-              <div className="flex gap-2 shrink-0">
-                <button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 border border-gray-100 rounded-xl hover:text-nesthub-primary hover:bg-gray-50 transition-all">
-                  Edit
-                </button>
-                <button className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-400 border border-red-50 rounded-xl hover:bg-red-50 transition-all">
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Post Notice Modal */}
       <PostNoticeModal
         isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        onSubmit={(data) => {
-          handlePost(data);
-        }}
+        onClose={() => { setIsPostModalOpen(false); setPostError(null); }}
+        onSubmit={handlePost}
+        loading={posting}
+        error={postError}
       />
     </div>
   );

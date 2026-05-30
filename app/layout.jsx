@@ -1,5 +1,6 @@
 import { DM_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "../store/authStore";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -25,7 +26,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${syne.variable} ${jetbrainsMono.variable} font-sans bg-[#F9FAFB] text-[#111827] antialiased`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

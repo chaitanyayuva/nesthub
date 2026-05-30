@@ -4,15 +4,30 @@ import { useState } from "react";
 import { useComplaints } from "../../../hooks/useComplaints";
 import { ComplaintQueue } from "../../../components/admin/ComplaintQueue";
 import { AssignComplaintModal } from "../../../components/admin/AssignComplaintModal";
-import { 
-  Filter, 
-  FastForward, 
-  MessageSquareWarning 
+import {
+  Filter,
+  FastForward,
+  MessageSquareWarning,
+  Loader2,
 } from "lucide-react";
 
 export default function AdminComplaints() {
-  const { complaints, activeTab, setActiveTab, stats } = useComplaints();
+  const { complaints, activeTab, setActiveTab, stats, loading, error, assignComplaint, updateStatus } = useComplaints();
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [assigning, setAssigning] = useState(false);
+
+  const handleAssign = async (data) => {
+    if (!selectedComplaint) return;
+    setAssigning(true);
+    try {
+      await assignComplaint(selectedComplaint.ticketId || selectedComplaint.id, data);
+      setSelectedComplaint(null);
+    } catch (err) {
+      console.error("Assign failed:", err.response?.data?.message || err.message);
+    } finally {
+      setAssigning(false);
+    }
+  };
 
   return (
     <div className="animate-fade-in max-w-[1400px] mx-auto px-4 sm:px-0">
@@ -35,8 +50,8 @@ export default function AdminComplaints() {
              key={tab}
              onClick={() => setActiveTab(tab)}
              className={`flex-1 min-w-[120px] sm:min-w-0 sm:flex-initial px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 relative overflow-hidden shrink-0 ${
-               activeTab === tab 
-                 ? "bg-white text-nesthub-primary shadow-xl shadow-nesthub-primary/5 border border-gray-100 scale-[1.02]" 
+               activeTab === tab
+                 ? "bg-white text-nesthub-primary shadow-xl shadow-nesthub-primary/5 border border-gray-100 scale-[1.02]"
                  : "text-gray-400 hover:text-nesthub-primary hover:bg-white/50"
              }`}
            >
@@ -55,10 +70,18 @@ export default function AdminComplaints() {
 
       {/* Grid of Complaints */}
       <div className="min-h-[400px]">
-         <ComplaintQueue
-           complaints={complaints}
-           onAssign={(complaint) => setSelectedComplaint(complaint)}
-         />
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 size={32} className="animate-spin text-nesthub-primary" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 text-red-500 font-semibold">{error}</div>
+        ) : (
+          <ComplaintQueue
+            complaints={complaints}
+            onAssign={(complaint) => setSelectedComplaint(complaint)}
+          />
+        )}
       </div>
 
       {/* Summary Footer */}
@@ -77,7 +100,6 @@ export default function AdminComplaints() {
             Generate Performance Report
             <FastForward size={16} strokeWidth={3} className="animate-pulse" />
          </button>
-         
          <MessageSquareWarning size={180} className="absolute -bottom-10 -right-10 text-white/5 opacity-40 rotate-12 hidden lg:block pointer-events-none" />
       </div>
 
@@ -86,11 +108,10 @@ export default function AdminComplaints() {
         isOpen={!!selectedComplaint}
         onClose={() => setSelectedComplaint(null)}
         complaint={selectedComplaint}
-        onSubmit={(data) => {
-          console.log("Assign complaint:", data);
-          setSelectedComplaint(null);
-        }}
+        onSubmit={handleAssign}
+        loading={assigning}
       />
     </div>
   );
 }
+

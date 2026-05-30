@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NestHub Admin</string>
+    <string name="title_activity_main">NestHub Admin</string>
+    <string name="package_name">com.nesthub.admin</string>
+    <string name="custom_url_scheme">com.nesthub.admin</string>
+</resources>

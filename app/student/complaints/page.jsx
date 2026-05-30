@@ -2,23 +2,28 @@
 
 import { useState } from "react";
 import { useComplaints } from "../../../hooks/useComplaints";
-import { 
-  Wrench, 
-  Zap, 
-  Bed, 
-  Trash2, 
-  HelpCircle, 
-  Plus, 
+import {
+  Wrench,
+  Zap,
+  Bed,
+  Trash2,
+  HelpCircle,
   ChevronRight,
-  AlertCircle,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  Loader2,
+  CheckCircle2
 } from "lucide-react";
 
 export default function StudentComplaints() {
-  const { stats } = useComplaints();
+  const { stats, createComplaint } = useComplaints();
   const [selectedCategory, setSelectedCategory] = useState("Plumbing");
   const [selectedPriority, setSelectedPriority] = useState("P2");
+  const [description, setDescription] = useState("");
+  const [subject, setSubject] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const categories = [
     { id: "Plumbing", icon: Wrench, label: "Plumbing", color: "text-blue-500 bg-blue-50" },
@@ -28,6 +33,42 @@ export default function StudentComplaints() {
     { id: "Other", icon: HelpCircle, label: "Other", color: "text-purple-500 bg-purple-50" },
   ];
 
+  const handleSubmit = async () => {
+    if (!subject || !description) {
+      setError("Please provide a subject and details for your complaint.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const formData = new FormData();
+      formData.append("category", selectedCategory);
+      
+      // Convert P1/P2/P3 to High/Medium/Low
+      const priorityMap = { P1: "High", P2: "Medium", P3: "Low" };
+      formData.append("priority", priorityMap[selectedPriority]);
+      
+      formData.append("subject", subject);
+      formData.append("description", description);
+      
+      await createComplaint(formData);
+      
+      setSuccess(true);
+      setSubject("");
+      setDescription("");
+      
+      // Clear success after 3s
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create ticket");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 pb-6 max-w-lg mx-auto w-full animate-fade-in transition-all duration-300">
       {/* Header */}
@@ -35,6 +76,19 @@ export default function StudentComplaints() {
         <h1 className="font-heading text-3xl font-bold text-nesthub-primary tracking-tight">Support Ticket</h1>
         <p className="text-gray-400 font-medium text-sm mt-2">Report an issue and our team will resolve it quickly.</p>
       </div>
+      
+      {/* Messages */}
+      {error && (
+        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 text-sm font-medium">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 bg-green-50 text-green-700 p-4 rounded-2xl border border-green-100 text-sm font-medium flex items-center gap-2 animate-slide-up">
+          <CheckCircle2 size={18} />
+          Ticket submitted successfully! We'll look into it.
+        </div>
+      )}
 
       {/* Select Category */}
       <div className="mb-10">
@@ -82,6 +136,16 @@ export default function StudentComplaints() {
              ))}
            </div>
         </div>
+        
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Brief Subject (e.g., Leaking Tap)"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="w-full bg-gray-50 border-none rounded-2xl p-4 text-sm focus:outline-none focus:ring-4 focus:ring-nesthub-primary/5 transition-all placeholder:text-gray-400 font-medium"
+          />
+        </div>
 
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4 text-nesthub-primary">
@@ -90,13 +154,22 @@ export default function StudentComplaints() {
           </div>
           <textarea
             placeholder="E.g. The tap in room 302B is leaking water..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="w-full bg-gray-50 border-none rounded-[32px] p-6 text-sm focus:outline-none focus:ring-4 focus:ring-nesthub-primary/5 transition-all min-h-[160px] placeholder:text-gray-300 font-medium"
           />
         </div>
 
-        <button className="w-full bg-nesthub-primary text-white py-5 rounded-[28px] font-black text-xs uppercase tracking-widest shadow-2xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all active:scale-95 flex items-center justify-center gap-3">
-          Launch Live Ticket
-          <ChevronRight size={18} strokeWidth={3} />
+        <button 
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full bg-nesthub-primary text-white py-5 rounded-[28px] font-black text-xs uppercase tracking-widest shadow-2xl shadow-nesthub-primary/20 hover:bg-[#204a35] transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70"
+        >
+          {loading ? (
+            <Loader2 size={18} strokeWidth={3} className="animate-spin" />
+          ) : (
+            <>Launch Live Ticket <ChevronRight size={18} strokeWidth={3} /></>
+          )}
         </button>
       </div>
 

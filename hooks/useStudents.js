@@ -1,35 +1,67 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "./useDebounce";
-
-const MOCK_STUDENTS = [
-  { id: "NH-2024-0012", name: "Rahul Kumar", institution: "IIM Bangalore", room: "302-B", rentStatus: "Paid", joinDate: "12 Jan, 2024", email: "rahul.k@example.com" },
-  { id: "NH-2024-0015", name: "Ankit Sharma", institution: "BITS Pilani", room: "105-A", rentStatus: "Pending", joinDate: "15 Jan, 2024", email: "ankit.s@example.com" },
-  { id: "NH-2024-0018", name: "Vikram Singh", institution: "RVCE", room: "210-C", rentStatus: "Paid", joinDate: "20 Jan, 2024", email: "vikram.s@example.com" },
-  { id: "NH-2024-0022", name: "Siddharth J.", institution: "PES University", room: "404-A", rentStatus: "Overdue", joinDate: "05 Feb, 2024", email: "sid.j@example.com" },
-  { id: "NH-2024-0025", name: "Aman Gupta", institution: "MS Ramaiah", room: "112-B", rentStatus: "Paid", joinDate: "10 Feb, 2024", email: "aman.g@example.com" },
-  { id: "NH-2024-0028", name: "Rohit Verma", institution: "IIM Bangalore", room: "302-A", rentStatus: "Paid", joinDate: "12 Feb, 2024", email: "rohit.v@example.com" },
-];
+import api from "../lib/api";
 
 export function useStudents() {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounce(searchTerm, 300);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [pages, setPages] = useState(1);
+  const limit = 10;
 
-  const filteredStudents = useMemo(() => {
-    if (!debouncedSearch) return MOCK_STUDENTS;
-    const term = debouncedSearch.toLowerCase();
-    return MOCK_STUDENTS.filter(s => 
-      s.name.toLowerCase().includes(term) || 
-      s.id.toLowerCase().includes(term) || 
-      s.institution.toLowerCase().includes(term)
-    );
-  }, [debouncedSearch]);
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
+  const fetchStudents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = { page, limit };
+      if (debouncedSearch) params.search = debouncedSearch;
+      if (statusFilter) params.status = statusFilter;
+
+      const res = await api.get("/api/students", { params });
+      setStudents(res.data.data || []);
+      setTotal(res.data.total || 0);
+      setPages(res.data.pages || 1);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load students");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, debouncedSearch, statusFilter]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  const addStudent = async (formData) => {
+    const res = await api.post("/api/students", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    fetchStudents();
+    return res.data;
+  };
 
   return {
-    students: filteredStudents,
+    students,
+    loading,
+    error,
     searchTerm,
     setSearchTerm,
-    totalCount: 124
+    statusFilter,
+    setStatusFilter,
+    page,
+    setPage,
+    total,
+    pages,
+    totalCount: total,
+    refetch: fetchStudents,
+    addStudent,
   };
 }
